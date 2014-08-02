@@ -21,8 +21,9 @@ function Start() {
 }
 
 function Update () {
-
-	Move();
+	if(networkView.isMine){
+		Move();
+	}
 	UseWeapon();
 	
 }
@@ -101,6 +102,7 @@ function OnCollisionEnter2D( coll: Collision2D ) {
 	if ( coll.gameObject.tag == "Bullet" ) {
 		PickAmmo( coll.gameObject );
 	}
+	Debug.Log(coll.gameObject.name);
 }
 
 function OnCollisionStay2D(coll: Collision2D) {
