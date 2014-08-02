@@ -23,9 +23,8 @@ function Start() {
 function Update () {
 	if(networkView.isMine){
 		Move();
+		UseWeapon();
 	}
-	UseWeapon();
-	
 }
 
 //TODO: 
@@ -66,10 +65,10 @@ function UseWeapon(){
 		var boxCollider2D = this.GetComponent(BoxCollider2D);
 		
 		if ( isHeadRight ) {
-			bullet = Instantiate (bulletPrefab, Vector3(transform.position.x + boxCollider2D.size.x, transform.position.y, transform.position.z), Quaternion.identity);
+			bullet = Network.Instantiate (bulletPrefab, Vector3(transform.position.x + boxCollider2D.size.x, transform.position.y, transform.position.z), Quaternion.identity,0);
 			bullet.rigidbody2D.velocity.x = 5;
 		} else {
-			bullet = Instantiate (bulletPrefab, Vector3(transform.position.x - boxCollider2D.size.x, transform.position.y, transform.position.z), Quaternion.identity);
+			bullet = Network.Instantiate (bulletPrefab, Vector3(transform.position.x - boxCollider2D.size.x, transform.position.y, transform.position.z), Quaternion.identity,0);
 			bullet.rigidbody2D.velocity.x = -5;
 		}
 		bullet.rigidbody2D.velocity.y = 3;
