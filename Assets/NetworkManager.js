@@ -40,8 +40,9 @@ function StartServer() {
 
 function OnServerInitialized() {
 	Debug.Log("Server Initializied");
-	SpawnPlayer();
+	InitWall();
 	SpawnMap ();
+	SpawnPlayer();	
 }
 
 function RefreshHostList() {
@@ -60,6 +61,7 @@ function JoinServer( hostData : HostData) {
 
 function OnConnectedToServer() {
 	Debug.Log("Server Joined");
+	InitWall();
 	SpawnPlayer();
 }
 
