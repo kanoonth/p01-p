@@ -3,15 +3,19 @@
 var spaceButton : KeyCode;
 var leftButton : KeyCode;
 var rightButton : KeyCode;
-
+var isHeadRight : boolean = false;
 var JUMP_SPEED : float = 5.0f;
-
 var isJumpping : boolean = false;
-
 var LeftScreenPosition : float;
 var RightScreenPosition : float;
+var bulletPrefab : GameObject;
+var fireButton : KeyCode;
+var shootable : boolean = true;
+var ammo : int = 0;
 
 function Start() {
+	//Random Head direction. 
+	ammo = 3;
 	LeftScreenPosition = GetLeftScreenPosition();
 	RightScreenPosition = GetRightScreenPosition();
 }
@@ -19,32 +23,65 @@ function Start() {
 function Update () {
 
 	Move();
-
+	UseWeapon();
+	
 }
 
-// TODO: 
+//TODO: 
 function GetLeftScreenPosition() {
 	return -5;
 }
 
-// TODO: 
+//TODO: 
 function GetRightScreenPosition() {
 	return 5;
 }
 
 function Move () {
 		
-	if ( Input.GetKey( leftButton ) ) 
+	if ( Input.GetKey( leftButton ) ) { 
 		rigidbody2D.velocity.x = -5;
+		isHeadRight = false;
+	}
 		
-	if ( Input.GetKey( rightButton ) ) 
+	if ( Input.GetKey( rightButton ) ) {
 		rigidbody2D.velocity.x = 5;
-		
-	if ( Input.GetKey( spaceButton ) && !isJumpping ) {
+		isHeadRight = true;
+	}
+	
+	if ( Input.GetKey( spaceButton ) && !isJumpping) {
 		rigidbody2D.velocity.y = JUMP_SPEED;
 		isJumpping = true;	
 	}
 
+}
+
+function UseWeapon(){
+	if ( Input.GetKey( fireButton ) && shootable && ammo > 0) {
+		ammo -= 1;
+		shootable = false;
+		var bullet : GameObject;
+		
+		var boxCollider2D = this.GetComponent(BoxCollider2D);
+		
+		if ( isHeadRight ) {
+			bullet = Instantiate (bulletPrefab, Vector3(transform.position.x + boxCollider2D.size.x, transform.position.y, transform.position.z), Quaternion.identity);
+			bullet.rigidbody2D.velocity.x = 5;
+		} else {
+			bullet = Instantiate (bulletPrefab, Vector3(transform.position.x - boxCollider2D.size.x, transform.position.y, transform.position.z), Quaternion.identity);
+			bullet.rigidbody2D.velocity.x = -5;
+		}
+		bullet.rigidbody2D.velocity.y = 3;
+		DelayUpdate();
+	}
+}
+//TODO:
+function Respawn() {
+
+}
+
+function Die() {
+	GameObject.Destroy(this);
 }
 
 function OnCollideRightWorldEdge() {
@@ -55,20 +92,40 @@ function OnCollideLeftWorldEdge() {
 	transform.position.x = RightScreenPosition;
 }
 
-function OnCollisionEnter2D(coll: Collision2D) {
-	if ( coll.gameObject.tag == "Wall" )
+function PickAmmo( bullet : GameObject ) {
+	ammo += 1;
+	GameObject.Destroy( bullet );
+}
+
+function OnCollisionEnter2D( coll: Collision2D ) {
+	if ( coll.gameObject.tag == "Bullet" ) {
+		PickAmmo( coll.gameObject );
+	}
+}
+
+function OnCollisionStay2D(coll: Collision2D) {
+	if ( coll.gameObject.tag == "Wall" || coll.gameObject.tag == "Block" ) {
 		isJumpping = false;
+	}
 }
 
-function OnCollisionExit2D(coll: Collision2D) {
-	if ( coll.gameObject.tag == "Wall" )
+function OnCollisionExit2D( coll: Collision2D ) {
+	if ( coll.gameObject.tag == "Wall" || coll.gameObject.tag == "Block" ) {
 		isJumpping = true;
+	}
 }
 
-function OnTriggerEnter2D(coll: Collider2D) {
-	if ( coll.gameObject.name == "LeftWall" )
+function OnTriggerEnter2D( coll: Collider2D ) {
+	if ( coll.gameObject.name == "LeftWall" ) {
 		OnCollideLeftWorldEdge();
+	}
 		
-	if ( coll.gameObject.name == "RightWall" )
+	if ( coll.gameObject.name == "RightWall" ) {
 		OnCollideRightWorldEdge();
+	}
+}
+
+function DelayUpdate() {
+	yield WaitForSeconds(0.4);
+	shootable = true;
 }
