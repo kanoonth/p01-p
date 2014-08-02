@@ -94,7 +94,11 @@ function OnCollideLeftWorldEdge() {
 
 function PickAmmo( bullet : GameObject ) {
 	ammo += 1;
-	Network.Destroy(bullet);
+	try{
+		Network.Destroy(bullet);
+	} catch(err) {
+		Debug.Log(err.ToString());
+	}
 	//GameObject.Destroy( bullet );
 }
 
