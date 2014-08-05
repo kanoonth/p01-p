@@ -25,7 +25,7 @@ var map = [
 var mapPosition : Array = [];
 
 function Start () {
-	MasterServer.ipAddress = "158.108.224.89";
+	MasterServer.ipAddress = "158.108.137.178";
 }
 
 function Update () {
