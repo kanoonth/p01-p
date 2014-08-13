@@ -145,12 +145,13 @@ function OnCollisionEnter2D( coll: Collision2D ) {
 }
 
 function checkGround() {
-	var onRightWall : boolean = Physics2D.Linecast(transform.position, jumpCheckRight.position, 1 << LayerMask.NameToLayer("Block") , 0, 0); ;
-	var onLeftWall : boolean = Physics2D.Linecast(transform.position, jumpCheckLeft.position, 1 << LayerMask.NameToLayer("Block") , 0, 0);
-	var onGround : boolean = Physics2D.Linecast(transform.position, jumpCheckBottom.position, 1 << LayerMask.NameToLayer("Block") , 0, 0);
-	Debug.Log(onGround);
-	if( onGround ){
-		isJumpping = onGround;
+	var onRightWall : boolean = isCollidedToWall( jumpCheckRight.position, "Block" );
+	var onLeftWall : boolean = isCollidedToWall( jumpCheckLeft.position, "Block" );
+	var onGround : boolean = isCollidedToWall( jumpCheckBottom.position, "Block" );
+	var onEnemy : boolean = isCollidedToWall( jumpCheckBottom.position, "Enemy" );
+	
+	if( onGround || onEnemy){
+		isJumpping = ( onGround || onEnemy );
 		return;
 	}
 	
@@ -164,6 +165,10 @@ function checkGround() {
 	}
 	
 	isJumpping = false;
+}
+
+function isCollidedToWall( position : Vector2 , layer : String ) {
+	return Physics2D.Linecast(transform.position, position, 1 << LayerMask.NameToLayer( layer ) , 0, 0);
 }
 
 /*

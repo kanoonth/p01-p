@@ -97,6 +97,13 @@ function SpawnMap(){
 	InitWall();
 	InitBlock();
 	SpawnEnemy();
+	SpawnEnemy();
+	SpawnEnemy();
+	SpawnEnemy();
+	SpawnEnemy();
+	SpawnEnemy();
+	SpawnEnemy();
+	SpawnEnemy();
 }
 
 function getScreenWidth() {

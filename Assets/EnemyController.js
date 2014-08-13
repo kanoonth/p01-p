@@ -62,7 +62,7 @@ function Update () {
 function standByForAttackingPlayer(){
 	var point = new Vector2( this.transform.position.x , this.transform.position.y );
 	
-	around = Physics2D.OverlapCircleAll( point , this.attackRange , 1 << LayerMask.NameToLayer("Player") );
+	around = Physics2D.OverlapCircleAll( point , this.attackRange , 1 << LayerMask.NameToLayer("Player"), -10, 10 );
 	// 1 << LayerMask.NameToLayer("Player") is player's layer for ray casting.
 	
 	if( around.length > 0 ){ //players in range.
