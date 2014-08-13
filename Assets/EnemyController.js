@@ -5,13 +5,17 @@ var player : GameObject;
 var around : Collider2D[];
 
 var attackRange : float;
+var rangeFactor : float;
 var walkSpeed : float;
 
 var spawnPosition : Vector2;
-//var limitWalkingRange : float;
+var limitWalkingRange : float;
+var limitWalkingRangeFactor : float;
 
 var blockSizeHeight : float;
 var blockSizeWidth : float;
+
+var backToOrigin : boolean;
 
 function Start () {
 	var mainCamera : GameObject = GameObject.Find("Main Camera");
@@ -22,11 +26,40 @@ function Start () {
 	
 	spawnPosition = this.transform.position;
 	
-	attackRange = this.blockSizeWidth;
+	this.rangeFactor = 1f;
+	attackRange = this.blockSizeWidth * this.rangeFactor;
+	
+	this.limitWalkingRangeFactor = 1.5f;
+	this.limitWalkingRange = this.blockSizeWidth * this.limitWalkingRangeFactor;
 	walkSpeed = 1f;
+	
+	this.backToOrigin = false;
 }
 
 function Update () {
+	this.standByForAttackingPlayer();
+	
+	if( !isInLimitRange() ){
+		backToOrigin = true;
+	}
+	
+	if( backToOrigin ){
+		var distanceFromOrigin = this.transform.position.x - this.spawnPosition.x;
+		if( distanceFromOrigin > 0 ){
+			this.walk( -walkSpeed*3 );
+		}
+		else{
+			this.walk( walkSpeed*3 );
+		}
+	}
+	// near the origin
+	var isAtOrigin = Mathf.Abs( this.transform.position.x - this.spawnPosition.x ) < 0.3;
+	if( isAtOrigin ){
+		backToOrigin = false;
+	}
+}
+
+function standByForAttackingPlayer(){
 	var point = new Vector2( this.transform.position.x , this.transform.position.y );
 	
 	around = Physics2D.OverlapCircleAll( point , this.attackRange , 1 << LayerMask.NameToLayer("Player") , 0, 0);
@@ -44,16 +77,31 @@ function Update () {
 
 function walkTowardPlayer( playerPosition : Vector2 ){
 	var pos = this.transform.position;
-	if( pos.x < playerPosition.x ){
-		walk( walkSpeed );
+	
+	if( isInLimitRange() ){
+		if( pos.x < playerPosition.x ){
+			walk( walkSpeed );
+		}
+		else{
+			walk( -walkSpeed );
+		}
 	}
-	else{
-		walk( -walkSpeed );
-	}
+	
 }
 
 function walk( speed : float ){
 	this.rigidbody2D.velocity.x = speed;
+}
+
+function isInLimitRange(){
+	var point = new Vector2( this.transform.position.x , this.transform.position.y );
+	var rangeX = Mathf.Abs( this.spawnPosition.x - point.x );
+	//return true if it's in the limit range.
+	
+	Debug.Log( this.spawnPosition.x );
+	Debug.Log( point.x );
+	Debug.Log( this.limitWalkingRange );
+	return rangeX <= this.limitWalkingRange ;
 }
 
 function getClosestPlayer( players : Collider2D[] ){
@@ -86,7 +134,8 @@ function checkPlayerInRange( players : Collider2D[] ){
 		if( players[i] != null ){
 		
 			var distanceFromPlayer = Mathf.Abs( this.transform.position.y - players[i].transform.position.y );
-			var isInRange = distanceFromPlayer >= blockSizeHeight * 1.5 ;
+			// range in yaxis
+			var isInRange = distanceFromPlayer >= blockSizeHeight ;
 			if( isInRange ){
 				availableTarget.push( false );
 			}
@@ -107,10 +156,18 @@ function getDistance( p : Vector2 ){
 }
 
 
-function setAttackRange( newRange : float ){
-	this.attackRange = newRange;
+function setAttackRangeFactor( newRange : float ){
+	this.rangeFactor = newRange;
+	// range in x axis
+	this.attackRange = this.blockSizeWidth * this.rangeFactor;
 }
 
-//function setLimitWalkingRange( newRange : float ){
-//	this.limitWalkingRange = newRange;
-//}
+function setWalkSpeed( speed : float ){
+	this.walkSpeed = speed;
+}
+
+function setLimitWalkingRangeFactor( newRange : float ){
+	this.limitWalkingRangeFactor = newRange;
+	// limit range in x axis
+	this.limitWalkingRange = this.blockSizeWidth * this.limitWalkingRangeFactor;
+}
