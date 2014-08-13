@@ -17,6 +17,9 @@ var anim : Animator;
 var jumpTime : float = 0;
 var jumpDelay : float = 4f;
 var jumped : boolean;
+var jumpCheckBottom : Transform;
+var jumpCheckRight : Transform;
+var jumpCheckLeft : Transform;
 
 function Start() {
 	//Random Head direction. 
@@ -31,6 +34,8 @@ function Update () {
 		Move();
 		UseWeapon();
 	}
+	
+	checkGround();
 }
 
 //TODO: 
@@ -71,7 +76,7 @@ function Move () {
 		isHeadRight = true;
 	}
 	*/
-	if ( Input.GetKey( spaceButton ) && !isJumpping) {
+	if ( Input.GetKey( spaceButton ) && isJumpping) {
 		anim.SetTrigger( "Jump" );
 		rigidbody2D.velocity.y = JUMP_SPEED;
 		isJumpping = true;	
@@ -80,7 +85,7 @@ function Move () {
 	}
 	
 	jumpTime -= Time.deltaTime;
-	if ( jumpTime <= 0 || !isJumpping ) {
+	if ( jumpTime <= 0 || isJumpping ) {
 		anim.SetTrigger( "Land" );
 		jumped = false;
 	}
@@ -139,17 +144,43 @@ function OnCollisionEnter2D( coll: Collision2D ) {
 	}
 }
 
+function checkGround() {
+	var onRightWall : boolean = Physics2D.Linecast(transform.position, jumpCheckRight.position, 1 << LayerMask.NameToLayer("Block") , 0, 0); ;
+	var onLeftWall : boolean = Physics2D.Linecast(transform.position, jumpCheckLeft.position, 1 << LayerMask.NameToLayer("Block") , 0, 0);
+	var onGround : boolean = Physics2D.Linecast(transform.position, jumpCheckBottom.position, 1 << LayerMask.NameToLayer("Block") , 0, 0);
+	Debug.Log(onGround);
+	if( onGround ){
+		isJumpping = onGround;
+		return;
+	}
+	
+	if( onRightWall ) {
+		isJumpping = onRightWall;
+		return;
+	}
+	else if( onLeftWall ) {
+		isJumpping = onLeftWall;
+		return;
+	}
+	
+	isJumpping = false;
+}
+
+/*
 function OnCollisionStay2D(coll: Collision2D) {
+	
 	if ( coll.gameObject.tag == "Wall" || coll.gameObject.tag == "Block" ) {
 		isJumpping = false;
 	}
 }
+
 
 function OnCollisionExit2D( coll: Collision2D ) {
 	if ( coll.gameObject.tag == "Wall" || coll.gameObject.tag == "Block" ) {
 		isJumpping = true;
 	}
 }
+*/
 
 function OnTriggerEnter2D( coll: Collider2D ) {
 	if ( coll.gameObject.name == "LeftWall" ) {

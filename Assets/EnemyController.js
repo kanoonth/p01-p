@@ -62,7 +62,7 @@ function Update () {
 function standByForAttackingPlayer(){
 	var point = new Vector2( this.transform.position.x , this.transform.position.y );
 	
-	around = Physics2D.OverlapCircleAll( point , this.attackRange , 1 << LayerMask.NameToLayer("Player") , 0, 0);
+	around = Physics2D.OverlapCircleAll( point , this.attackRange , 1 << LayerMask.NameToLayer("Player") );
 	// 1 << LayerMask.NameToLayer("Player") is player's layer for ray casting.
 	
 	if( around.length > 0 ){ //players in range.
@@ -77,7 +77,7 @@ function standByForAttackingPlayer(){
 
 function walkTowardPlayer( playerPosition : Vector2 ){
 	var pos = this.transform.position;
-	
+	Debug.Log("I'm walking...");
 	if( isInLimitRange() ){
 		if( pos.x < playerPosition.x ){
 			walk( walkSpeed );
@@ -96,11 +96,11 @@ function walk( speed : float ){
 function isInLimitRange(){
 	var point = new Vector2( this.transform.position.x , this.transform.position.y );
 	var rangeX = Mathf.Abs( this.spawnPosition.x - point.x );
-	//return true if it's in the limit range.
+	// return true if it's in the limit range.
 	
-	Debug.Log( this.spawnPosition.x );
-	Debug.Log( point.x );
-	Debug.Log( this.limitWalkingRange );
+	// Debug.Log( this.spawnPosition.x );
+	// Debug.Log( point.x );
+	// Debug.Log( this.limitWalkingRange );
 	return rangeX <= this.limitWalkingRange ;
 }
 
