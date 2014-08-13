@@ -1,8 +1,8 @@
 ﻿#pragma strict
 
 var spaceButton : KeyCode;
-var leftButton : KeyCode;
-var rightButton : KeyCode;
+//var leftButton : KeyCode;
+//var rightButton : KeyCode;
 var isHeadRight : boolean = false;
 var JUMP_SPEED : float = 5.0f;
 var isJumpping : boolean = false;
@@ -12,12 +12,18 @@ var bulletPrefab : GameObject;
 var fireButton : KeyCode;
 var shootable : boolean = true;
 var ammo : int = 0;
+var speed : float = 4f;
+var anim : Animator;
+var jumpTime : float = 0;
+var jumpDelay : float = 4f;
+var jumped : boolean;
 
 function Start() {
 	//Random Head direction. 
 	ammo = 3;
 	LeftScreenPosition = GetLeftScreenPosition();
 	RightScreenPosition = GetRightScreenPosition();
+	anim = this.GetComponent( Animator );
 }
 
 function Update () {
@@ -38,7 +44,23 @@ function GetRightScreenPosition() {
 }
 
 function Move () {
+
+	anim.SetFloat( "speed", Mathf.Abs( Input.GetAxisRaw( "Horizontal" ) ) );
+	
+	if(Input.GetAxisRaw("Horizontal") > 0)
+		{
+			transform.Translate(Vector3.right * speed * Time.deltaTime); 
+			transform.eulerAngles = new Vector2(0, 0); //this sets the rotation of the gameobject
+			isHeadRight = true;
+		}
 		
+	if(Input.GetAxisRaw("Horizontal") < 0)
+		{
+			transform.Translate(Vector3.right * speed * Time.deltaTime);
+			transform.eulerAngles = new Vector2(0, 180); //this sets the rotation of the gameobject
+			isHeadRight = false;
+		}
+		/*
 	if ( Input.GetKey( leftButton ) ) { 
 		rigidbody2D.velocity.x = -5;
 		isHeadRight = false;
@@ -48,10 +70,19 @@ function Move () {
 		rigidbody2D.velocity.x = 5;
 		isHeadRight = true;
 	}
-	
+	*/
 	if ( Input.GetKey( spaceButton ) && !isJumpping) {
+		anim.SetTrigger( "Jump" );
 		rigidbody2D.velocity.y = JUMP_SPEED;
 		isJumpping = true;	
+		jumpTime = jumpDelay;
+		jumped = true;
+	}
+	
+	jumpTime -= Time.deltaTime;
+	if ( jumpTime <= 0 || !isJumpping ) {
+		anim.SetTrigger( "Land" );
+		jumped = false;
 	}
 
 }
