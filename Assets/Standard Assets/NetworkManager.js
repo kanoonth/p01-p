@@ -1,10 +1,6 @@
 ﻿#pragma strict
 
 var playerPrefab : GameObject;
-var hostList : HostData[] ;
-	
-var typeName = "UniqueGameName";
-var gameName = "RoomName";
 
 var mainCam : Camera;
 var blockPrefab : GameObject;
@@ -28,67 +24,6 @@ var map = [
 	
 var mapPosition : Array = [];
 
-function Start () {
-	MasterServer.ipAddress = "158.108.229.217";
-}
-
-function Update () {
-
-}
-
-function StartServer() {
-	var useNat = !Network.HavePublicAddress();
-	Network.InitializeServer(4, 25000, useNat);
-	MasterServer.RegisterHost(typeName, gameName);
-}
-
-function OnServerInitialized() {
-	Debug.Log("Server Initializied");
-	InitWall();
-	SpawnMap ();
-	SpawnPlayer();	
-}
-
-function RefreshHostList() {
-	MasterServer.RequestHostList(typeName);
-}
-
-function OnMasterServerEvent( msEvent : MasterServerEvent) {
-	if (msEvent == MasterServerEvent.HostListReceived) {
-		hostList = MasterServer.PollHostList ();
-	}
-}
-
-function JoinServer( hostData : HostData) {
-	Network.Connect(hostData);
-}
-
-function OnConnectedToServer() {
-	Debug.Log("Server Joined");
-	InitWall();
-	SpawnPlayer();
-}
-
-function OnGUI() {
-	if (!Network.isClient && !Network.isServer) {
-		if (GUI.Button(new Rect(100, 100, 250, 100), "Start Server")) {
-			StartServer();
-		}
-		
-		if (GUI.Button(new Rect(100, 250, 250, 100), "Refresh Hosts")) {
-			RefreshHostList();
-		}
-		
-		if (hostList != null) {
-			for (var i = 0; i < hostList.Length; i++) {
-				if (GUI.Button(new Rect(400, 100 + (110 * i), 300, 100), hostList[i].gameName)) {
-					JoinServer(hostList[i]);
-				}
-			}
-		}
-	}
-}
-
 function SpawnPlayer() {
 	Network.Instantiate(playerPrefab, new Vector3(0f, 5f, 0f), Quaternion.identity,0);
 }
@@ -96,10 +31,6 @@ function SpawnPlayer() {
 function SpawnMap(){
 	InitWall();
 	InitBlock();
-	SpawnEnemy();
-	SpawnEnemy();
-	SpawnEnemy();
-	SpawnEnemy();
 	SpawnEnemy();
 	SpawnEnemy();
 	SpawnEnemy();
@@ -116,7 +47,7 @@ function getScreenHeight() {
 
 function InitBlock() {
 	
-	var height = mainCam.ScreenToWorldPoint (new Vector3 ( 0f, Screen.height, 0f)).y * 2;
+	var height = mainCam.ScreenToWorldPoint( new Vector3 ( 0f, Screen.height, 0f)).y * 2;
 	var width = mainCam.ScreenToWorldPoint( new Vector3( Screen.width, 0f, 0f )).x  * 2;
 
 	var numBlockX = map.length;
