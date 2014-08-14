@@ -1,5 +1,4 @@
 ﻿#pragma strict
-
 var spaceButton : KeyCode;
 //var leftButton : KeyCode;
 //var rightButton : KeyCode;
@@ -18,9 +17,10 @@ var jumpTime : float = 0;
 var jumpDelay : float = 4f;
 var jumped : boolean;
 var jumpCheckBottom : Transform;
+var jumpCheckBottomRight : Transform;
+var jumpCheckBottomLeft : Transform;
 var jumpCheckRight : Transform;
 var jumpCheckLeft : Transform;
-
 function Start() {
 	//Random Head direction. 
 	ammo = 3;
@@ -28,28 +28,23 @@ function Start() {
 	RightScreenPosition = GetRightScreenPosition();
 	anim = this.GetComponent( Animator );
 }
-
 function Update () {
 	if(networkView.isMine){
 		Move();
 		UseWeapon();
 	}
 	
-	checkGround();
+	canJump();
 }
-
 //TODO: 
 function GetLeftScreenPosition() {
 	return -5;
 }
-
 //TODO: 
 function GetRightScreenPosition() {
 	return 5;
 }
-
 function Move () {
-
 	anim.SetFloat( "speed", Mathf.Abs( Input.GetAxisRaw( "Horizontal" ) ) );
 	
 	if(Input.GetAxisRaw("Horizontal") > 0)
@@ -89,9 +84,7 @@ function Move () {
 		anim.SetTrigger( "Land" );
 		jumped = false;
 	}
-
 }
-
 function UseWeapon(){
 	if ( Input.GetKey( fireButton ) && shootable && ammo > 0) {
 		ammo -= 1;
@@ -113,21 +106,16 @@ function UseWeapon(){
 }
 //TODO:
 function Respawn() {
-
 }
-
 function Die() {
 	GameObject.Destroy(this);
 }
-
 function OnCollideRightWorldEdge() {
 	transform.position.x = LeftScreenPosition;
 }
-
 function OnCollideLeftWorldEdge() {
 	transform.position.x = RightScreenPosition;
 }
-
 function PickAmmo( bullet : GameObject ) {
 	ammo += 1;
 	try{
@@ -137,17 +125,15 @@ function PickAmmo( bullet : GameObject ) {
 	}
 	//GameObject.Destroy( bullet );
 }
-
 function OnCollisionEnter2D( coll: Collision2D ) {
 	if ( coll.gameObject.tag == "Bullet" ) {
 		PickAmmo( coll.gameObject );
 	}
 }
-
-function checkGround() {
+function canJump() {
 	var onRightWall : boolean = isCollidedToWall( jumpCheckRight.position, "Block" );
 	var onLeftWall : boolean = isCollidedToWall( jumpCheckLeft.position, "Block" );
-	var onGround : boolean = isCollidedToWall( jumpCheckBottom.position, "Block" );
+	var onGround : boolean = onGround();
 	var onEnemy : boolean = isCollidedToWall( jumpCheckBottom.position, "Enemy" );
 	
 	if( onGround || onEnemy){
@@ -166,11 +152,22 @@ function checkGround() {
 	
 	isJumpping = false;
 }
-
 function isCollidedToWall( position : Vector2 , layer : String ) {
 	return Physics2D.Linecast(transform.position, position, 1 << LayerMask.NameToLayer( layer ) , 0, 0);
 }
-
+function onGround() {
+	if ( isCollidedToWall( jumpCheckBottom.position, "Block" ) ) {
+		return isCollidedToWall( jumpCheckBottom.position, "Block" );
+	}
+	
+	if ( isCollidedToWall( jumpCheckBottomRight.position, "Block" ) ) {
+		return isCollidedToWall( jumpCheckBottomRight.position, "Block" );
+	}
+	
+	if ( isCollidedToWall( jumpCheckBottomLeft.position, "Block" ) ) {
+		return isCollidedToWall( jumpCheckBottomLeft.position, "Block" );
+	}
+}
 /*
 function OnCollisionStay2D(coll: Collision2D) {
 	
@@ -178,15 +175,12 @@ function OnCollisionStay2D(coll: Collision2D) {
 		isJumpping = false;
 	}
 }
-
-
 function OnCollisionExit2D( coll: Collision2D ) {
 	if ( coll.gameObject.tag == "Wall" || coll.gameObject.tag == "Block" ) {
 		isJumpping = true;
 	}
 }
 */
-
 function OnTriggerEnter2D( coll: Collider2D ) {
 	if ( coll.gameObject.name == "LeftWall" ) {
 		OnCollideLeftWorldEdge();
@@ -196,7 +190,6 @@ function OnTriggerEnter2D( coll: Collider2D ) {
 		OnCollideRightWorldEdge();
 	}
 }
-
 function DelayUpdate() {
 	yield WaitForSeconds(0.4);
 	shootable = true;
