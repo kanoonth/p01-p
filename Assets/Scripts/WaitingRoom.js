@@ -37,8 +37,17 @@ function PlayerName( array: Array ) {
 
 function GameStart() {
 	if ( GUI.Button( CreateRect( 50, 80, 30, 18 ), "Start" ) ) {
-		Application.LoadLevel ("GamePlay");
+		StartGamePlay();
 	}
+}
+
+@RPC function StartGamePlay() {
+
+	Application.LoadLevel ("GamePlay");
+
+        if ( networkView.isMine ) {
+        networkView.RPC( "StartGamePlay", RPCMode.OthersBuffered );
+    }
 }
 
 function Back(){

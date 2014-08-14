@@ -20,8 +20,8 @@ function Log( text ) {
 }
 
 function Start () {
-	MasterServer.ipAddress = "127.0.0.1";
-	// MasterServer.port = 25054;
+	MasterServer.ipAddress = "171.6.210.69";
+	MasterServer.port = 25054;
 	RefreshRoomList();
 }
 
@@ -55,9 +55,9 @@ function OnConnectedToServer() {
 //////////////////////////////////////////////////////////////
 
 function CreateRoom() {
-	// var useNat = !Network.HavePublicAddress();
-	// Network.InitializeServer(4, 25000, useNat);
-	// MasterServer.RegisterHost(typeName, gameName);
+	 var useNat = !Network.HavePublicAddress();
+	 Network.InitializeServer(4, 25000, useNat);
+	 MasterServer.RegisterHost(typeName, gameName);
 	
 	// TODO: Go to scene create room.
 	Application.LoadLevel ("WaitingRoomScreen");
