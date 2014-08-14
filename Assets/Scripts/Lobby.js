@@ -60,6 +60,7 @@ function CreateRoom() {
 	// MasterServer.RegisterHost(typeName, gameName);
 	
 	// TODO: Go to scene create room.
+	Application.LoadLevel ("WaitingRoomScreen");
 }
 
 function OnServerInitialized() {

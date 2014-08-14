@@ -37,13 +37,13 @@ function PlayerName( array: Array ) {
 
 function GameStart() {
 	if ( GUI.Button( CreateRect( 50, 80, 30, 18 ), "Start" ) ) {
-		// TODO: Go to gamePlay
+		Application.LoadLevel ("GamePlay");
 	}
 }
 
 function Back(){
 	
 	if( GUI.Button( CreateRect( 93, 0, 7, 10 ), "Back" ) ) {
-		// TODO: Back to LobbyScene
+		Application.LoadLevel ("LobbyScene");
 	}
 }

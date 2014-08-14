@@ -24,6 +24,11 @@ var map = [
 	
 var mapPosition : Array = [];
 
+function Start(){
+	SpawnMap();
+	SpawnPlayer();
+}
+
 function SpawnPlayer() {
 	Network.Instantiate(playerPrefab, new Vector3(0f, 5f, 0f), Quaternion.identity,0);
 }
