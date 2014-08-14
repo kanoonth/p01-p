@@ -21,6 +21,7 @@ var jumpCheckBottomRight : Transform;
 var jumpCheckBottomLeft : Transform;
 var jumpCheckRight : Transform;
 var jumpCheckLeft : Transform;
+var animation : float = 0;
 function Start() {
 	//Random Head direction. 
 	ammo = 3;
@@ -30,7 +31,33 @@ function Start() {
 }
 function Update () {
 	if(networkView.isMine){
-		Move();
+//		Move();
+		if(rigidbody2D.velocity.x == 0f){
+			anim.SetFloat( "speed", Mathf.Abs( 0 ) );
+		}
+		if(Input.GetAxisRaw("Horizontal") > 0)
+		{
+			transform.Translate(Vector3.right * speed * Time.deltaTime); 
+			transform.eulerAngles = new Vector2(0, 0); //this sets the rotation of the gameobject
+			isHeadRight = true;
+		}
+		
+		if(Input.GetAxisRaw("Horizontal") < 0)
+		{
+			transform.Translate(Vector3.right * speed * Time.deltaTime);
+			transform.eulerAngles = new Vector2(0, 180); //this sets the rotation of the gameobject
+			isHeadRight = false;
+		}
+//		Debug.Log(Vector3.right);
+		if ( Input.GetKey( spaceButton ) ) {
+			Jump();
+		}
+		
+		jumpTime -= Time.deltaTime;
+		if ( jumpTime <= 0 || isJumpping ) {
+			anim.SetTrigger( "Land" );
+			jumped = false;
+		}
 		UseWeapon();
 	}
 	
@@ -44,22 +71,10 @@ function GetLeftScreenPosition() {
 function GetRightScreenPosition() {
 	return 5;
 }
-function Move () {
-	anim.SetFloat( "speed", Mathf.Abs( Input.GetAxisRaw( "Horizontal" ) ) );
-	
-	if(Input.GetAxisRaw("Horizontal") > 0)
-		{
-			transform.Translate(Vector3.right * speed * Time.deltaTime); 
-			transform.eulerAngles = new Vector2(0, 0); //this sets the rotation of the gameobject
-			isHeadRight = true;
-		}
-		
-	if(Input.GetAxisRaw("Horizontal") < 0)
-		{
-			transform.Translate(Vector3.right * speed * Time.deltaTime);
-			transform.eulerAngles = new Vector2(0, 180); //this sets the rotation of the gameobject
-			isHeadRight = false;
-		}
+function Move ( x : float ) {
+//  anim.SetFloat( "speed", Mathf.Abs( Input.GetAxisRaw( "Horizontal" ) ) );
+		anim.SetFloat( "speed", Mathf.Abs( x ) );
+//	Debug.Log(x);
 		/*
 	if ( Input.GetKey( leftButton ) ) { 
 		rigidbody2D.velocity.x = -5;
@@ -70,19 +85,16 @@ function Move () {
 		rigidbody2D.velocity.x = 5;
 		isHeadRight = true;
 	}
-	*/
-	if ( Input.GetKey( spaceButton ) && isJumpping) {
+	*/	
+}
+
+function Jump(){
+	if(isJumpping) {
 		anim.SetTrigger( "Jump" );
 		rigidbody2D.velocity.y = JUMP_SPEED;
 		isJumpping = true;	
 		jumpTime = jumpDelay;
 		jumped = true;
-	}
-	
-	jumpTime -= Time.deltaTime;
-	if ( jumpTime <= 0 || isJumpping ) {
-		anim.SetTrigger( "Land" );
-		jumped = false;
 	}
 }
 function UseWeapon(){
@@ -116,6 +128,26 @@ function OnCollideRightWorldEdge() {
 function OnCollideLeftWorldEdge() {
 	transform.position.x = RightScreenPosition;
 }
+function PlayerMovement( moveX : float , moveY : float , force : float ){
+	Debug.Log(moveY + " " + moveX + " " + force);
+	if(moveX == 0){
+		rigidbody2D.velocity.x = 0;
+		Move( moveX );
+	}
+	else if(moveX < 0f){
+		transform.Translate(Vector3.right * speed * Time.deltaTime); 
+		transform.eulerAngles = new Vector2(0, 180);
+//		rigidbody2D.velocity.x = -1*(force/20);
+		Move( moveX );
+	}
+	else if(moveX > 0f){
+		transform.Translate(Vector3.right * speed * Time.deltaTime); 
+		transform.eulerAngles = new Vector2(0, 0);
+//		rigidbody2D.velocity.x = 1*(force/20);
+		Move( moveX );
+	}
+	
+}
 function PickAmmo( bullet : GameObject ) {
 	ammo += 1;
 	try{
@@ -133,8 +165,8 @@ function OnCollisionEnter2D( coll: Collision2D ) {
 function canJump() {
 	var onRightWall : boolean = isCollidedToWall( jumpCheckRight.position, "Block" );
 	var onLeftWall : boolean = isCollidedToWall( jumpCheckLeft.position, "Block" );
-	var onGround : boolean = onGround();
-	var onEnemy : boolean = isCollidedToWall( jumpCheckBottom.position, "Enemy" );
+	var onGround : boolean = onGround( "Block" );
+	var onEnemy : boolean = onGround( "Enemy" );
 	
 	if( onGround || onEnemy){
 		isJumpping = ( onGround || onEnemy );
@@ -155,17 +187,17 @@ function canJump() {
 function isCollidedToWall( position : Vector2 , layer : String ) {
 	return Physics2D.Linecast(transform.position, position, 1 << LayerMask.NameToLayer( layer ) , 0, 0);
 }
-function onGround() {
-	if ( isCollidedToWall( jumpCheckBottom.position, "Block" ) ) {
-		return isCollidedToWall( jumpCheckBottom.position, "Block" );
+function onGround( layer : String ) {
+	if ( isCollidedToWall( jumpCheckBottom.position, layer ) ) {
+		return isCollidedToWall( jumpCheckBottom.position, layer );
 	}
 	
-	if ( isCollidedToWall( jumpCheckBottomRight.position, "Block" ) ) {
-		return isCollidedToWall( jumpCheckBottomRight.position, "Block" );
+	if ( isCollidedToWall( jumpCheckBottomRight.position, layer ) ) {
+		return isCollidedToWall( jumpCheckBottomRight.position, layer );
 	}
 	
-	if ( isCollidedToWall( jumpCheckBottomLeft.position, "Block" ) ) {
-		return isCollidedToWall( jumpCheckBottomLeft.position, "Block" );
+	if ( isCollidedToWall( jumpCheckBottomLeft.position, layer ) ) {
+		return isCollidedToWall( jumpCheckBottomLeft.position, layer );
 	}
 }
 /*

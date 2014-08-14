@@ -77,7 +77,7 @@ function standByForAttackingPlayer(){
 
 function walkTowardPlayer( playerPosition : Vector2 ){
 	var pos = this.transform.position;
-	Debug.Log("I'm walking...");
+//	Debug.Log("I'm walking...");
 	if( isInLimitRange() ){
 		if( pos.x < playerPosition.x ){
 			walk( walkSpeed );
