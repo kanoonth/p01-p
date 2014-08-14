@@ -1,7 +1,7 @@
 ﻿#pragma strict
 
-var roomList : HostData[];
-
+var rooms : HostData[];
+var updateRoomListGUI = false;
 var typeName = "Mode01";
 var gameName = "Untitled";
 
@@ -31,12 +31,14 @@ function Update () {
 
 function RefreshRoomList() {
 	MasterServer.RequestHostList(typeName);
+	Log("Acquiring Room List");
 }
 
 function OnMasterServerEvent( msEvent : MasterServerEvent ) {
 	if (msEvent == MasterServerEvent.HostListReceived) {
-		Log("Room list acquired.");
-		roomList = MasterServer.PollHostList ();
+		Log("Room List Acquired");
+		rooms = MasterServer.PollHostList();
+		updateRoomListGUI = true;
 	}
 }
 
@@ -48,6 +50,7 @@ function JoinRoom( hostData : HostData) {
 
 function OnConnectedToServer() {
 	Log("Room Joined");
+	Application.LoadLevel ("WaitingRoomScene");
 	// InitWall();
 	// SpawnPlayer();
 }
@@ -59,8 +62,7 @@ function CreateRoom() {
 	 Network.InitializeServer(4, 25000, useNat);
 	 MasterServer.RegisterHost(typeName, gameName);
 	
-	// TODO: Go to scene create room.
-	Application.LoadLevel ("WaitingRoomScreen");
+	Application.LoadLevel ("WaitingRoomScene");
 }
 
 function OnServerInitialized() {
@@ -84,9 +86,10 @@ function OnGUI(){
 		CreateRoom();
 	}
 	
+	ShowRoomList();
+	
 	GUI.Label( CreateRect( 10, 0, 40, 10 ), consoleText );
 	
-	ShowRoomList();
 }
 
 /* Percent Width */
@@ -105,25 +108,33 @@ function CreateRect(x : long, y : long, width : long, height : long) {
 
 function ShowRoomList() {
 
-	if ( roomList == null ) {
-		Log("No server.");
-		return;
-	}
-	
-	if ( roomList.Length == 0 ) {
-		Log("No room in server.");
-		return;
-	}
-	
-	scrollPosition = GUI.BeginScrollView( CreateRect( 15,15,70,80 ), scrollPosition ,CreateRect( 0, 0, 0, roomList.Length * 10 ) );
- 	
-    for ( var i = 1; i <= roomList.Length; i++ ) {
-    	if ( GUI.Button( CreateRect( 0, ( i - 1 ) * 10, 100, 10 ), roomList[i].gameName) ) {
-			JoinRoom( roomList[i] );
-		}
+	if ( updateRoomListGUI ) {
+		
+		updateRoomListGUI = false;
+		
+		if ( rooms.Length == 0 ) {
+			
+			Log("No Room Available");
+		
+		} else {
+		
+			Log( rooms.Length + " Rooms available.");	    
+	  	}  
     }
+    
+    if ( rooms == null ) {
+    	return;
+    } 
+    
+    scrollPosition = GUI.BeginScrollView( CreateRect( 10, 20, 80, 80 ), scrollPosition ,CreateRect( 0, 0, 0, rooms.Length * 10 ) );
+	for ( var i = 0; i < rooms.Length; i++ ) {
+			   
+	if ( GUI.Button( CreateRect( 0, i * 10, 80, 10 ), rooms[i].gameName ) ) {
+			JoinRoom( rooms[i] );
+		}
+	}
+
+	GUI.EndScrollView ();
 	
-    //   scrollPosition.y = Mathf.Infinity;
-    GUI.EndScrollView ();
 }
 

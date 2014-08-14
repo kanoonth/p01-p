@@ -37,9 +37,6 @@ function SpawnMap(){
 	InitWall();
 	InitBlock();
 	SpawnEnemy();
-	SpawnEnemy();
-	SpawnEnemy();
-	SpawnEnemy();
 }
 
 function getScreenWidth() {
@@ -63,7 +60,7 @@ function InitBlock() {
 			var originX = j * (  (width / numBlockY)) - ( width / numBlockY )*(0.5 * (numBlockY-1));
 			var originY = ( numBlockX - i) * (  (height / numBlockX)) - ( height / numBlockX )*(0.5 * (numBlockX+1));
 			if ( map[i][j] == 1 ) {	 
-				var block : GameObject = Network.Instantiate ( blockPrefab, Vector3( originX, originY, 0 ), Quaternion.identity,0);
+				var block : GameObject = Instantiate( blockPrefab, Vector3( originX, originY, 0 ), Quaternion.identity );
 				
 				block.transform.localScale.x = width / numBlockY;
 				block.transform.localScale.y = height / numBlockX;
