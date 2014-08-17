@@ -20,14 +20,16 @@ function Start () {
 }
 
 function Update () {
-	CheckLeftJoystick();
-	CheckRightJoystick();
+	if ( networkView.isMine ) {
+		CheckLeftJoystick();
+		CheckRightJoystick();
+	}
 }
 
 function CheckLeftJoystick() {
-	if ( moveJoystick.JSK_TouchForce > minTForceToMove )  {
-		mainController.PlayerMovement( moveJoystick.JSK_Direction.normalized.x ,moveJoystick.JSK_Direction.normalized.y ,moveJoystick.JSK_TouchForce );
-	}
+		if ( moveJoystick.JSK_TouchForce > minTForceToMove )  {
+			mainController.PlayerMovement( moveJoystick.JSK_Direction.normalized.x ,moveJoystick.JSK_Direction.normalized.y ,moveJoystick.JSK_TouchForce );
+		}
 }
 
 function CheckRightJoystick() {

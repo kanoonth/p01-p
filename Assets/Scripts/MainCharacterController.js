@@ -22,6 +22,7 @@ var jumpCheckBottomLeft : Transform;
 var jumpCheckRight : Transform;
 var jumpCheckLeft : Transform;
 var animation : float = 0;
+
 function Start() {
 	//Random Head direction. 
 	ammo = 3;
@@ -95,6 +96,7 @@ function Jump(){
 		isJumpping = true;	
 		jumpTime = jumpDelay;
 		jumped = true;
+		
 	}
 }
 function UseWeapon(){
@@ -130,22 +132,23 @@ function OnCollideLeftWorldEdge() {
 }
 function PlayerMovement( moveX : float , moveY : float , force : float ){
 	Debug.Log(moveY + " " + moveX + " " + force);
-	if(moveX == 0){
-		rigidbody2D.velocity.x = 0;
-		Move( moveX );
-	}
-	else if(moveX < 0f){
-		transform.Translate(Vector3.right * speed * Time.deltaTime); 
-		transform.eulerAngles = new Vector2(0, 180);
-//		rigidbody2D.velocity.x = -1*(force/20);
-		Move( moveX );
-	}
-	else if(moveX > 0f){
-		transform.Translate(Vector3.right * speed * Time.deltaTime); 
-		transform.eulerAngles = new Vector2(0, 0);
-//		rigidbody2D.velocity.x = 1*(force/20);
-		Move( moveX );
-	}
+		if(moveX == 0){
+			rigidbody2D.velocity.x = 0;
+			Move( moveX );
+		}
+		else if(moveX < 0f){
+			transform.Translate(Vector3.right * speed * Time.deltaTime); 
+			transform.eulerAngles = new Vector2(0, 180);
+	//		rigidbody2D.velocity.x = -1*(force/20);
+			Move( moveX );
+		}
+		else if(moveX > 0f){
+			transform.Translate(Vector3.right * speed * Time.deltaTime); 
+			transform.eulerAngles = new Vector2(0, 0);
+	//		rigidbody2D.velocity.x = 1*(force/20);
+			Move( moveX );
+		}
+	
 	
 }
 function PickAmmo( bullet : GameObject ) {

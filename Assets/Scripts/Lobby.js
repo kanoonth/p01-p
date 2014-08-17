@@ -20,7 +20,7 @@ function Log( text ) {
 }
 
 function Start () {
-	MasterServer.ipAddress = "171.6.210.69";
+	MasterServer.ipAddress = "158.108.230.170";
 	MasterServer.port = 25054;
 	RefreshRoomList();
 }
