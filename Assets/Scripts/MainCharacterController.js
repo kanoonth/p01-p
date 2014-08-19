@@ -95,20 +95,23 @@ function Jump(){
 	var jumpType = canJump();
 	var xJump = 1;
 	var angle = 0;
+	anim.SetTrigger( "Jump" );
 	if(isJumpping) {
 		if( isHeadRight ){
 			xJump = -1;
 			angle = 180;
 		}
 		if( jumpType.Equals( "groundJump" ) ) {
-			anim.SetTrigger( "Jump" );
+			
+			Debug.Log("fuck");
 			rigidbody2D.velocity.y = JUMP_SPEED;
 			
 		}
 		else if( jumpType.Equals( "rightWallJump" ) ) {
 			anim.SetTrigger( "Jump" );
 			rigidbody2D.velocity.y = JUMP_SPEED;
-			rigidbody2D.velocity.x = xJump*JUMP_SPEED*2;
+			rigidbody2D.velocity.x = xJump*3;
+			//transform.Translate(Vector3.right * xJump*20 * Time.deltaTime); 
 			transform.eulerAngles = new Vector2(0, angle);
 			isHeadRight = !isHeadRight;
 			Debug.Log(transform.eulerAngles);
@@ -165,15 +168,15 @@ function PlayerMovement( moveX : float , moveY : float , force : float ){
 			Move( moveX );
 		}
 		else if(moveX < 0f){
-			transform.Translate(Vector3.right * speed * Time.deltaTime); 
+		//	transform.Translate(Vector3.right * speed * Time.deltaTime); 
 			transform.eulerAngles = new Vector2(0, 180);
-	//		rigidbody2D.velocity.x = -1*(force/20);
+			rigidbody2D.velocity.x = -1*(force/20);
 			Move( moveX );
 		}
 		else if(moveX > 0f){
-			transform.Translate(Vector3.right * speed * Time.deltaTime); 
+		//	transform.Translate(Vector3.right * speed * Time.deltaTime); 
 			transform.eulerAngles = new Vector2(0, 0);
-	//		rigidbody2D.velocity.x = 1*(force/20);
+			rigidbody2D.velocity.x = 1*(force/20);
 			Move( moveX );
 		}
 	
