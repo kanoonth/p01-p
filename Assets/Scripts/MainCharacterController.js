@@ -40,6 +40,7 @@ function Update () {
 		{
 			transform.Translate(Vector3.right * speed * Time.deltaTime); 
 			transform.eulerAngles = new Vector2(0, 0); //this sets the rotation of the gameobject
+			Move( Input.GetAxisRaw( "Horizontal" ) );
 			isHeadRight = true;
 		}
 		
@@ -47,6 +48,7 @@ function Update () {
 		{
 			transform.Translate(Vector3.right * speed * Time.deltaTime);
 			transform.eulerAngles = new Vector2(0, 180); //this sets the rotation of the gameobject
+			Move( Input.GetAxisRaw( "Horizontal" ) );
 			isHeadRight = false;
 		}
 //		Debug.Log(Vector3.right);
@@ -62,7 +64,7 @@ function Update () {
 		UseWeapon();
 	}
 	
-	canJump();
+	
 }
 //TODO: 
 function GetLeftScreenPosition() {
@@ -90,9 +92,35 @@ function Move ( x : float ) {
 }
 
 function Jump(){
+	var jumpType = canJump();
+	var xJump = 1;
+	var angle = 0;
 	if(isJumpping) {
-		anim.SetTrigger( "Jump" );
-		rigidbody2D.velocity.y = JUMP_SPEED;
+		if( isHeadRight ){
+			xJump = -1;
+			angle = 180;
+		}
+		if( jumpType.Equals( "groundJump" ) ) {
+			anim.SetTrigger( "Jump" );
+			rigidbody2D.velocity.y = JUMP_SPEED;
+			
+		}
+		else if( jumpType.Equals( "rightWallJump" ) ) {
+			anim.SetTrigger( "Jump" );
+			rigidbody2D.velocity.y = JUMP_SPEED;
+			rigidbody2D.velocity.x = xJump*JUMP_SPEED*2;
+			transform.eulerAngles = new Vector2(0, angle);
+			isHeadRight = !isHeadRight;
+			Debug.Log(transform.eulerAngles);
+		}
+		/*
+		else if( jumpType.Equals( "leftWallJump" ) ) {
+			rigidbody2D.velocity.y = JUMP_SPEED*2;
+			rigidbody2D.velocity.x = 20;
+			//transform.eulerAngles = new Vector2(0, 0);
+		} 
+		*/
+		
 		isJumpping = true;	
 		jumpTime = jumpDelay;
 		jumped = true;
@@ -173,17 +201,19 @@ function canJump() {
 	
 	if( onGround || onEnemy){
 		isJumpping = ( onGround || onEnemy );
-		return;
+		return "groundJump";
 	}
 	
 	if( onRightWall ) {
 		isJumpping = onRightWall;
-		return;
+		return "rightWallJump";
 	}
+	
 	else if( onLeftWall ) {
 		isJumpping = onLeftWall;
-		return;
+		return "leftWallJump";
 	}
+	
 	
 	isJumpping = false;
 }
