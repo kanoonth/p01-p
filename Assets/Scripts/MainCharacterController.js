@@ -22,6 +22,7 @@ var jumpCheckBottomLeft : Transform;
 var jumpCheckRight : Transform;
 var jumpCheckLeft : Transform;
 var animation : float = 0;
+var onWall : boolean = false;
 
 function Start() {
 	//Random Head direction. 
@@ -38,7 +39,10 @@ function Update () {
 		}
 		if(Input.GetAxisRaw("Horizontal") > 0)
 		{
-			transform.Translate(Vector3.right * speed * Time.deltaTime); 
+			//transform.Translate(Vector3.right * speed * Time.deltaTime);
+			if( !onWall ) {
+				rigidbody2D.velocity.x = 1*(4);
+			}
 			transform.eulerAngles = new Vector2(0, 0); //this sets the rotation of the gameobject
 			Move( Input.GetAxisRaw( "Horizontal" ) );
 			isHeadRight = true;
@@ -46,7 +50,10 @@ function Update () {
 		
 		if(Input.GetAxisRaw("Horizontal") < 0)
 		{
-			transform.Translate(Vector3.right * speed * Time.deltaTime);
+			//transform.Translate(Vector3.right * speed * Time.deltaTime);
+			if( !onWall ) {
+				rigidbody2D.velocity.x = -1*(4);
+			} 
 			transform.eulerAngles = new Vector2(0, 180); //this sets the rotation of the gameobject
 			Move( Input.GetAxisRaw( "Horizontal" ) );
 			isHeadRight = false;
@@ -204,16 +211,19 @@ function canJump() {
 	
 	if( onGround || onEnemy){
 		isJumpping = ( onGround || onEnemy );
+		onWall = false;
 		return "groundJump";
 	}
 	
 	if( onRightWall ) {
 		isJumpping = onRightWall;
+		onWall = true;
 		return "rightWallJump";
 	}
 	
 	else if( onLeftWall ) {
 		isJumpping = onLeftWall;
+		onWall = true;
 		return "leftWallJump";
 	}
 	
